@@ -1,0 +1,787 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>MMDC Medical and Dental Center Dubai — Premium Dental Clinic</title>
+<link href="https://fonts.googleapis.com/css2?family=Playfair+Display:ital,wght@0,400;0,600;1,400&family=Inter:wght@300;400;500&display=swap" rel="stylesheet">
+<script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r128/three.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.12.2/gsap.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.12.2/ScrollTrigger.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/vanilla-tilt/1.8.0/vanilla-tilt.min.js"></script>
+<style>
+*{margin:0;padding:0;box-sizing:border-box}
+body{font-family:'Inter',sans-serif;background:#fff;color:#1a1a1a;overflow-x:hidden}
+
+/* ---- 3D CANVAS ---- */
+#canvas-container { position: absolute; top: 0; left: 0; width: 100%; height: 100%; z-index: -1; pointer-events: none; overflow: hidden; background: linear-gradient(135deg, #f0faf6 0%, #e8f7f1 40%, #f5f9ff 100%); }
+
+/* ---- NAV (Glassmorphism) ---- */
+.nav{background:rgba(255, 255, 255, 0.7);backdrop-filter:blur(16px);-webkit-backdrop-filter:blur(16px);border-bottom:1px solid rgba(255,255,255,0.5);padding:0 32px;display:flex;align-items:center;justify-content:space-between;height:70px;position:sticky;top:0;z-index:100;box-shadow: 0 4px 30px rgba(0, 0, 0, 0.03);}
+.logo{display:flex;align-items:center;gap:10px}
+.logo-mark{width:38px;height:38px;background:linear-gradient(135deg, #0F6E56, #1D9E75);border-radius:50%;display:flex;align-items:center;justify-content:center;box-shadow: 0 4px 10px rgba(29, 158, 117, 0.3);}
+.logo-mark svg{width:18px;height:18px}
+.logo-text{font-size:16px;font-weight:600;color:#0F6E56;letter-spacing:.5px}
+.logo-sub{font-size:10px;color:#6b9e8f;letter-spacing:1px;text-transform:uppercase;font-weight:500;}
+.nav-links{display:flex;align-items:center;gap:28px}
+.nav-links a{font-size:14px;color:#444;text-decoration:none;cursor:pointer;transition:all .3s;font-weight:500}
+.nav-links a:hover{color:#0F6E56; transform: translateY(-1px);}
+.nav-cta{background:linear-gradient(135deg, #0F6E56, #1D9E75);color:#fff;border:none;padding:10px 22px;border-radius:8px;font-size:13px;font-weight:600;cursor:pointer;font-family:'Inter',sans-serif;transition:all .3s;display:flex;align-items:center;gap:6px;box-shadow: 0 4px 12px rgba(29, 158, 117, 0.3);}
+.nav-cta:hover{transform:translateY(-2px);box-shadow: 0 6px 16px rgba(29, 158, 117, 0.4);}
+.nav-phone{font-size:13px;color:#0F6E56;font-weight:600;display:flex;align-items:center;gap:6px}
+
+/* ---- HERO ---- */
+.hero{padding:100px 32px 60px;display:grid;grid-template-columns:1fr 440px;gap:40px;align-items:center;min-height:90vh;position:relative;background:transparent;}
+.hero-content { position: relative; z-index: 2; }
+
+.hero-badge{display:inline-flex;align-items:center;gap:8px;background:rgba(255,255,255,0.8);backdrop-filter:blur(8px);border:1px solid rgba(29,158,117,0.2);padding:8px 16px;border-radius:30px;font-size:12px;color:#0F6E56;font-weight:600;margin-bottom:24px;box-shadow: 0 4px 15px rgba(0,0,0,0.03);}
+.badge-pulse{width:8px;height:8px;border-radius:50%;background:#1D9E75;animation:pulse 2s infinite}
+@keyframes pulse{0%,100%{opacity:1;transform:scale(1);box-shadow:0 0 0 0 rgba(29,158,117,0.4)}50%{opacity:.7;transform:scale(.9);box-shadow:0 0 0 6px rgba(29,158,117,0)}}
+
+.hero h1{font-family:'Playfair Display',serif;font-size:52px;line-height:1.15;font-weight:600;color:#0a2e24;margin-bottom:18px; perspective: 1000px;}
+.hero h1 span{color:#1D9E75;font-style:italic}
+.hero-sub{font-size:15px;color:#444;line-height:1.7;max-width:480px;margin-bottom:32px;}
+.hero-btns{display:flex;gap:14px;margin-bottom:40px;flex-wrap:wrap}
+.btn-primary{background:linear-gradient(135deg, #0F6E56, #1D9E75);color:#fff;border:none;padding:14px 28px;border-radius:10px;font-size:14px;font-weight:600;cursor:pointer;font-family:'Inter',sans-serif;transition:all .3s;display:flex;align-items:center;gap:8px;box-shadow: 0 6px 20px rgba(29, 158, 117, 0.3);}
+.btn-primary:hover{transform:translateY(-3px);box-shadow: 0 10px 25px rgba(29, 158, 117, 0.4);}
+.btn-ghost{background:rgba(255,255,255,0.7);backdrop-filter:blur(10px);color:#0F6E56;border:1.5px solid #1D9E75;padding:14px 28px;border-radius:10px;font-size:14px;font-weight:600;cursor:pointer;font-family:'Inter',sans-serif;transition:all .3s}
+.btn-ghost:hover{background:#1D9E75;color:#fff;}
+
+.hero-trust{display:flex;gap:24px;flex-wrap:wrap;}
+.trust-pill{display:flex;align-items:center;gap:8px;font-size:12px;color:#333;font-weight:500; background: rgba(255,255,255,0.5); padding: 6px 12px; border-radius: 20px; backdrop-filter: blur(5px);}
+.trust-pill svg{flex-shrink:0}
+
+.hero-visual{display:flex;flex-direction:column;gap:16px; position: relative; z-index: 2; transform-style: preserve-3d; perspective: 1000px;}
+.glass-card { background:rgba(255, 255, 255, 0.6); backdrop-filter:blur(16px); -webkit-backdrop-filter:blur(16px); border:1px solid rgba(255, 255, 255, 0.8); border-radius:16px; padding:20px; box-shadow: 0 8px 32px rgba(31, 38, 135, 0.07); }
+.rating-card{display:flex;align-items:center;gap:16px}
+.rating-icon{width:50px;height:50px;background:linear-gradient(135deg, #e8f7f1, #d1f0e4);border-radius:12px;display:flex;align-items:center;justify-content:center;flex-shrink:0;box-shadow:inset 0 2px 4px rgba(255,255,255,0.5)}
+.rating-val{font-family:'Playfair Display',serif;font-size:30px;font-weight:700;color:#0a2e24;line-height:1}
+.rating-stars{display:flex;gap:3px;margin:4px 0}
+.star{width:14px;height:14px;background:#F59E0B;clip-path:polygon(50% 0%,61% 35%,98% 35%,68% 57%,79% 91%,50% 70%,21% 91%,32% 57%,2% 35%,39% 35%)}
+.rating-sub{font-size:12px;color:#555;font-weight:500;}
+.stats-row{display:grid;grid-template-columns:repeat(3,1fr);gap:12px}
+.stat-mini{text-align:center}
+.stat-n{font-family:'Playfair Display',serif;font-size:26px;font-weight:700;color:#0F6E56}
+.stat-l{font-size:11px;color:#666;margin-top:4px;text-transform:uppercase;letter-spacing:1px;font-weight:600}
+.booking-strip{background:linear-gradient(135deg, #0a2e24, #0F6E56);color:#fff;border-radius:14px;padding:16px 20px;display:flex;align-items:center;justify-content:space-between;box-shadow: 0 10px 30px rgba(10, 46, 36, 0.2);}
+.booking-strip-text{font-size:14px;font-weight:600}
+.booking-strip-sub{font-size:12px;opacity:.8;margin-top:4px}
+.booking-strip-btn{background:rgba(255,255,255,.15);backdrop-filter:blur(5px);border:1px solid rgba(255,255,255,.4);color:#fff;padding:8px 16px;border-radius:8px;font-size:13px;font-weight:600;cursor:pointer;font-family:'Inter',sans-serif;transition:all .3s;white-space:nowrap}
+.booking-strip-btn:hover{background:#fff;color:#0F6E56;}
+
+/* ---- TRUST BAR ---- */
+.trust-bar{background:#0a2e24;padding:16px 32px;display:flex;gap:0;overflow:hidden;position:relative;z-index:10;}
+.tb-item{flex:1;display:flex;align-items:center;justify-content:center;gap:10px;font-size:12px;color:rgba(255,255,255,.8);text-transform:uppercase;letter-spacing:1px;border-right:1px solid rgba(255,255,255,.1);font-weight:500;}
+.tb-item:last-child{border-right:none}
+.tb-dot{width:6px;height:6px;border-radius:50%;background:#1D9E75;flex-shrink:0;box-shadow: 0 0 8px #1D9E75;}
+
+/* ---- SECTION COMMON ---- */
+.section{padding:80px 32px; position: relative;}
+.sec-eyebrow{font-size:12px;font-weight:600;color:#1D9E75;text-transform:uppercase;letter-spacing:2px;margin-bottom:12px}
+.sec-title{font-family:'Playfair Display',serif;font-size:40px;font-weight:700;color:#0a2e24;line-height:1.2;margin-bottom:16px}
+.sec-title em{font-style:italic;color:#1D9E75}
+.sec-sub{font-size:16px;color:#555;line-height:1.7;max-width:580px}
+.section-header{margin-bottom:50px}
+
+/* ---- SERVICES ---- */
+.services{background:#f8fdfb; position:relative;}
+.services::before {content:'';position:absolute;top:0;left:0;width:100%;height:100%;background:radial-gradient(circle at 80% 20%, rgba(29,158,117,0.03) 0%, transparent 40%); pointer-events:none;}
+.svc-grid{display:grid;grid-template-columns:repeat(4,1fr);gap:20px; perspective: 1200px;}
+.svc-card{background:rgba(255,255,255,0.7);backdrop-filter:blur(10px);border:1px solid rgba(29,158,117,0.15);border-radius:16px;padding:30px 24px;cursor:pointer;transition:all .3s ease;position:relative;overflow:hidden;transform-style: preserve-3d;box-shadow: 0 4px 20px rgba(0,0,0,0.02);}
+.svc-card::after{content:'';position:absolute;top:0;left:0;width:4px;height:0;background:linear-gradient(to bottom, #1D9E75, #0F6E56);transition:height .4s ease;border-radius:0 0 4px 0}
+.svc-card:hover::after{height:100%}
+.svc-icon{width:52px;height:52px;background:linear-gradient(135deg, #e8f7f1, #c5e8dd);border-radius:12px;display:flex;align-items:center;justify-content:center;margin-bottom:20px;transition:all .4s ease;transform: translateZ(20px);}
+.svc-card:hover .svc-icon{background:linear-gradient(135deg, #1D9E75, #0F6E56); transform: translateZ(30px) scale(1.1);}
+.svc-card:hover .svc-icon svg path,.svc-card:hover .svc-icon svg circle,.svc-card:hover .svc-icon svg rect,.svc-card:hover .svc-icon svg line{stroke:#fff}
+.svc-name{font-size:18px;font-weight:600;color:#0a2e24;margin-bottom:8px;transform: translateZ(10px);}
+.svc-desc{font-size:14px;color:#666;line-height:1.6;transform: translateZ(5px);}
+.svc-link{font-size:13px;color:#1D9E75;font-weight:600;margin-top:16px;display:inline-flex;align-items:center;gap:6px;transition:gap .2s;}
+.svc-card:hover .svc-link{gap:10px;}
+
+/* ---- WHY CHOOSE ---- */
+.why{background:#fff; overflow:hidden;}
+.why-grid{display:grid;grid-template-columns:1fr 1fr;gap:64px;align-items:center}
+.why-points{display:flex;flex-direction:column;gap:24px}
+.why-point{display:flex;gap:20px;align-items:flex-start;padding:24px;border-radius:16px;background:rgba(248, 253, 251, 0.5);border:1px solid #e8f4f0;transition:all .3s ease; transform-style: preserve-3d;}
+.why-point:hover{border-color:#1D9E75; background:#fff; box-shadow: 0 10px 30px rgba(29,158,117,0.08); transform: translateY(-5px);}
+.why-icon{width:48px;height:48px;background:linear-gradient(135deg, #e8f7f1, #c5e8dd);border-radius:12px;display:flex;align-items:center;justify-content:center;flex-shrink:0;box-shadow:inset 0 2px 5px rgba(255,255,255,0.8)}
+.why-title{font-size:16px;font-weight:600;color:#0a2e24;margin-bottom:6px}
+.why-text{font-size:14px;color:#666;line-height:1.6}
+.why-visual{background:linear-gradient(135deg, #f0faf6, #e2f2ed);border-radius:24px;padding:40px;display:flex;flex-direction:column;gap:20px;box-shadow: 0 20px 50px rgba(10,46,36,0.05); transform-style: preserve-3d;}
+.wv-head{font-family:'Playfair Display',serif;font-size:28px;color:#0a2e24;margin-bottom:6px; font-weight:700;}
+.wv-sub{font-size:15px;color:#555;line-height:1.7;margin-bottom:12px}
+.wv-stat{display:flex;align-items:center;gap:16px;padding:18px;background:rgba(255,255,255,0.9);backdrop-filter:blur(10px);border-radius:12px;border:1px solid rgba(255,255,255,1);box-shadow: 0 8px 20px rgba(0,0,0,0.03); transform: translateZ(20px); transition: transform .3s ease;}
+.wv-stat:hover { transform: translateZ(30px) scale(1.02); }
+.wv-num{font-family:'Playfair Display',serif;font-size:30px;font-weight:700;color:#0F6E56;min-width:70px}
+.wv-label{font-size:13px;color:#444;line-height:1.5;font-weight:500;}
+
+/* ---- DOCTORS ---- */
+.doctors{background:linear-gradient(to bottom, #fff, #f8fdfb);}
+.doc-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:24px; perspective: 1000px;}
+.doc-card{background:#fff;border:1px solid #e2f2ed;border-radius:16px;padding:32px 24px;cursor:pointer;transition:all .3s ease; text-align:center; transform-style: preserve-3d; box-shadow: 0 4px 15px rgba(0,0,0,0.02);}
+.doc-card:hover{border-color:#1D9E75;box-shadow:0 15px 35px rgba(29,158,117,0.1); background: linear-gradient(180deg, #fff 0%, #f0faf6 100%);}
+.doc-avatar{width:72px;height:72px;border-radius:50%;background:linear-gradient(135deg,#e8f7f1,#c5e8dd);border:3px solid #fff;box-shadow: 0 0 0 2px #1D9E75, 0 10px 20px rgba(29,158,117,0.2);display:flex;align-items:center;justify-content:center;font-size:22px;font-weight:600;color:#0F6E56;margin:0 auto 20px;font-family:'Inter',sans-serif; transform: translateZ(30px);}
+.doc-name{font-size:18px;font-weight:600;color:#0a2e24;margin-bottom:6px;transform: translateZ(15px);}
+.doc-role{font-size:13px;color:#666;margin-bottom:16px;line-height:1.5;transform: translateZ(10px);}
+.doc-tag{display:inline-block;background:#e8f7f1;color:#0F6E56;font-size:11px;padding:6px 14px;border-radius:30px;font-weight:600;letter-spacing:.5px;transform: translateZ(20px);}
+
+/* ---- REVIEWS ---- */
+.reviews{background:#fff; position: relative;}
+.reviews::after{content:'';position:absolute;right:0;bottom:0;width:400px;height:400px;background:radial-gradient(circle, rgba(29,158,117,0.04) 0%, transparent 70%); pointer-events:none;}
+.review-grid{display:grid;grid-template-columns:repeat(2,1fr);gap:24px; perspective: 1200px;}
+.review-card{border:1px solid #e8f4f0;border-radius:20px;padding:36px;transition:all .3s ease; background: rgba(255,255,255,0.8); backdrop-filter: blur(10px); box-shadow: 0 8px 25px rgba(0,0,0,0.02); transform-style: preserve-3d;}
+.review-card:hover{border-color:#1D9E75; transform: translateY(-5px); box-shadow: 0 15px 40px rgba(29,158,117,0.08);}
+.rev-header{display:flex;align-items:center;justify-content:space-between;margin-bottom:20px; transform: translateZ(10px);}
+.rev-stars{display:flex;gap:4px}
+.rev-date{font-size:13px;color:#999; font-weight:500;}
+.rev-text{font-size:15px;color:#444;line-height:1.8;margin-bottom:24px;font-style:italic; transform: translateZ(15px);}
+.rev-author{display:flex;align-items:center;gap:12px; transform: translateZ(20px);}
+.rev-avatar{width:40px;height:40px;border-radius:50%;background:linear-gradient(135deg, #e8f7f1, #1D9E75);display:flex;align-items:center;justify-content:center;font-size:14px;font-weight:600;color:#fff; box-shadow: 0 4px 10px rgba(29,158,117,0.2);}
+.rev-name{font-size:15px;font-weight:600;color:#0a2e24}
+.rev-verified{font-size:11px;color:#1D9E75;display:flex;align-items:center;gap:4px; font-weight:500;}
+
+/* ---- CTA ---- */
+.cta-section{background:linear-gradient(135deg,#0a2e24 0%,#0F6E56 60%,#1D9E75 100%);padding:100px 32px;text-align:center;position:relative;overflow:hidden;}
+.cta-section::before{content:'';position:absolute;right:-100px;top:-100px;width:400px;height:400px;border-radius:50%;background:radial-gradient(circle, rgba(255,255,255,0.1) 0%, transparent 70%); animation: float 10s infinite ease-in-out;}
+.cta-section::after{content:'';position:absolute;left:-80px;bottom:-80px;width:300px;height:300px;border-radius:50%;background:radial-gradient(circle, rgba(255,255,255,0.08) 0%, transparent 70%); animation: float 8s infinite ease-in-out reverse;}
+@keyframes float { 0%, 100% { transform: translateY(0) scale(1); } 50% { transform: translateY(30px) scale(1.05); } }
+
+.cta-eyebrow{font-size:13px;color:rgba(255,255,255,.7);text-transform:uppercase;letter-spacing:3px;margin-bottom:16px; font-weight:600;}
+.cta-title{font-family:'Playfair Display',serif;font-size:48px;font-weight:700;color:#fff;line-height:1.2;margin-bottom:20px}
+.cta-title em{font-style:italic;color:#9FE1CB}
+.cta-sub{font-size:16px;color:rgba(255,255,255,.8);margin-bottom:40px;line-height:1.6;max-width:600px;margin-left:auto;margin-right:auto;}
+.cta-btns{display:flex;gap:16px;justify-content:center;flex-wrap:wrap; position: relative; z-index: 2;}
+.btn-white{background:#fff;color:#0F6E56;border:none;padding:16px 36px;border-radius:10px;font-size:15px;font-weight:600;cursor:pointer;font-family:'Inter',sans-serif;transition:all .3s;box-shadow: 0 10px 30px rgba(0,0,0,0.15);}
+.btn-white:hover{background:#f0faf6;transform:translateY(-3px);box-shadow: 0 15px 40px rgba(0,0,0,0.2);}
+.btn-outline-white{background:rgba(255,255,255,0.05);backdrop-filter:blur(10px);color:#fff;border:2px solid rgba(255,255,255,.4);padding:16px 36px;border-radius:10px;font-size:15px;font-weight:600;cursor:pointer;font-family:'Inter',sans-serif;transition:all .3s}
+.btn-outline-white:hover{border-color:#fff;background:rgba(255,255,255,.15);transform:translateY(-3px);}
+.cta-info{display:flex;gap:36px;justify-content:center;margin-top:48px;flex-wrap:wrap; position: relative; z-index: 2;}
+.cta-info-item{display:flex;align-items:center;gap:10px;color:rgba(255,255,255,.8);font-size:14px;font-weight:500;}
+
+/* ---- CONTACT ---- */
+.contact{background:#f8fdfb;padding:80px 32px}
+.contact-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:24px;margin-top:50px; perspective: 1000px;}
+.contact-card{background:rgba(255,255,255,0.8);backdrop-filter:blur(10px);border:1px solid #e2f2ed;border-radius:20px;padding:40px 24px;text-align:center;transition:all .3s ease; box-shadow: 0 8px 25px rgba(0,0,0,0.02); transform-style: preserve-3d;}
+.contact-card:hover{border-color:#1D9E75; transform: translateY(-8px); box-shadow: 0 20px 40px rgba(29,158,117,0.08);}
+.contact-ic{width:60px;height:60px;background:linear-gradient(135deg, #e8f7f1, #c5e8dd);border-radius:50%;display:flex;align-items:center;justify-content:center;margin:0 auto 20px; box-shadow:inset 0 2px 5px rgba(255,255,255,0.8); transform: translateZ(30px);}
+.contact-lbl{font-size:12px;text-transform:uppercase;letter-spacing:1px;color:#888;margin-bottom:10px;font-weight:600; transform: translateZ(10px);}
+.contact-val{font-size:18px;font-weight:600;color:#0a2e24;margin-bottom:6px; transform: translateZ(20px);}
+.contact-val2{font-size:14px;color:#666; transform: translateZ(15px);}
+
+/* ---- FOOTER ---- */
+.footer{background:#0a2e24;padding:40px 48px;display:flex;align-items:center;justify-content:space-between;flex-wrap:wrap;gap:20px}
+.footer-logo{font-family:'Playfair Display',serif;font-size:24px;color:#fff;font-weight:700}
+.footer-logo span{color:#9FE1CB;font-style:italic}
+.footer-copy{font-size:13px;color:rgba(255,255,255,.5);letter-spacing:.5px}
+.footer-link{font-size:14px;color:rgba(255,255,255,.7);text-decoration:none;transition:color .3s; font-weight:500;}
+.footer-link:hover{color:#9FE1CB}
+
+/* ---- RESPONSIVE DESIGN ---- */
+@media (max-width: 1024px) {
+  .hero { grid-template-columns: 1fr; text-align: center; padding-top: 120px; }
+  .hero-sub { margin-left: auto; margin-right: auto; }
+  .hero-btns { justify-content: center; }
+  .hero-trust { justify-content: center; }
+  .hero-visual { margin-top: 40px; margin-left: auto; margin-right: auto; max-width: 500px; }
+  .svc-grid { grid-template-columns: repeat(2, 1fr); }
+  .why-grid { grid-template-columns: 1fr; gap: 40px; }
+  .doc-grid { grid-template-columns: repeat(2, 1fr); }
+  .review-grid { grid-template-columns: 1fr; }
+  .contact-grid { grid-template-columns: repeat(2, 1fr); }
+  .nav-links > a { display: none; }
+}
+
+@media (max-width: 768px) {
+  .hero { padding-top: 100px; min-height: auto; }
+  .hero h1 { font-size: 38px; }
+  .hero-sub { font-size: 14px; }
+  .nav { padding: 0 16px; height: 60px; }
+  .logo-text { font-size: 14px; }
+  .nav-phone { display: none; }
+  .nav-cta { padding: 8px 16px; font-size: 12px; }
+  .svc-grid { grid-template-columns: 1fr; }
+  .doc-grid { grid-template-columns: 1fr; }
+  .contact-grid { grid-template-columns: 1fr; }
+  .stats-row { grid-template-columns: 1fr; gap: 10px; }
+  .booking-strip { flex-direction: column; text-align: center; gap: 16px; }
+  .sec-title { font-size: 32px; }
+  .cta-title { font-size: 36px; }
+  .cta-section { padding: 60px 20px; }
+  .cta-info { flex-direction: column; gap: 16px; align-items: center; }
+  .section { padding: 60px 20px; }
+  .footer { flex-direction: column; text-align: center; justify-content: center; padding: 30px 20px; }
+  .trust-bar { flex-wrap: wrap; padding: 12px 16px; }
+  .tb-item { flex: 1 1 45%; border: none; padding: 6px 0; justify-content: flex-start; font-size: 11px; }
+}
+
+/* GSAP classes */
+.gsap-element { opacity: 0; }
+</style>
+</head>
+<body>
+
+<h2 style="position:absolute;width:1px;height:1px;overflow:hidden;clip:rect(0,0,0,0)">MMDC Medical and Dental Center Dubai — Premium Dental Clinic Website</h2>
+
+<!-- NAV -->
+<nav class="nav">
+  <div class="logo">
+    <div class="logo-mark">
+      <svg viewBox="0 0 18 18" fill="none"><path d="M9 2C6.8 2 5 3.8 5 6c0 1.2.5 2.2 1.3 3C5.5 9.6 5 10.7 5 12c0 2.2 1.8 4 4 4s4-1.8 4-4c0-1.3-.5-2.4-1.3-3C12.5 8.2 13 7.2 13 6c0-2.2-1.8-4-4-4z" stroke="white" stroke-width="1.3" fill="none"/><line x1="9" y1="8" x2="9" y2="13" stroke="white" stroke-width="1.3" stroke-linecap="round"/></svg>
+    </div>
+    <div>
+      <div class="logo-text">MMDC Dental</div>
+      <div class="logo-sub">Medical &amp; Dental Center</div>
+    </div>
+  </div>
+  <div class="nav-links">
+    <a onclick="document.getElementById('services-sec').scrollIntoView({behavior:'smooth'})">Services</a>
+    <a onclick="document.getElementById('doctors-sec').scrollIntoView({behavior:'smooth'})">Our Doctors</a>
+    <a onclick="document.getElementById('about-sec').scrollIntoView({behavior:'smooth'})">About</a>
+    <a onclick="document.getElementById('contact-sec').scrollIntoView({behavior:'smooth'})">Contact</a>
+    <div class="nav-phone">
+      <svg width="15" height="15" viewBox="0 0 13 13" fill="none"><path d="M2 2h3l1.5 3.5-2 1.2a8 8 0 003.8 3.8L9.5 8.5 13 10v3a1.5 1.5 0 01-1.5 1.5C4 14.5.5 11 .5 4A1.5 1.5 0 012 2z" stroke="#0F6E56" stroke-width="1.3" stroke-linecap="round"/></svg>
+      +971 4 277 6055
+    </div>
+    <button class="nav-cta" onclick="sendPrompt('I want to book a dental appointment at MMDC Dubai')">
+      <svg width="15" height="15" viewBox="0 0 14 14" fill="none"><rect x="1" y="2" width="12" height="11" rx="1.5" stroke="white" stroke-width="1.2"/><line x1="1" y1="5" x2="13" y2="5" stroke="white" stroke-width="1.2"/><line x1="4" y1="1" x2="4" y2="4" stroke="white" stroke-width="1.2" stroke-linecap="round"/><line x1="10" y1="1" x2="10" y2="4" stroke="white" stroke-width="1.2" stroke-linecap="round"/></svg>
+      Book Appointment
+    </button>
+  </div>
+</nav>
+
+<!-- HERO -->
+<section class="hero">
+  <div id="canvas-container"></div>
+  <div class="hero-content">
+    <div class="hero-badge gsap-hero">
+      <span class="badge-pulse"></span>
+      Dubai's #1 Rated Dental Clinic · 5.0★ on Google
+    </div>
+    <h1 class="gsap-hero">Expert Dental Care<br><span>You Can Trust</span></h1>
+    <p class="hero-sub gsap-hero">North American-trained specialists offering implants, veneers, orthodontics, and family dentistry — all under one roof at Tameem House, Dubai.</p>
+    <div class="hero-btns gsap-hero">
+      <button class="btn-primary" onclick="sendPrompt('Book appointment at MMDC Dubai')">
+        <svg width="16" height="16" viewBox="0 0 14 14" fill="none"><rect x="1" y="2" width="12" height="11" rx="1.5" stroke="white" stroke-width="1.3"/><line x1="1" y1="5" x2="13" y2="5" stroke="white" stroke-width="1.3"/><line x1="4" y1="1" x2="4" y2="4" stroke="white" stroke-width="1.3" stroke-linecap="round"/><line x1="10" y1="1" x2="10" y2="4" stroke="white" stroke-width="1.3" stroke-linecap="round"/></svg>
+        Book Free Consultation
+      </button>
+      <button class="btn-ghost" onclick="document.getElementById('services-sec').scrollIntoView({behavior:'smooth'})">View All Services</button>
+    </div>
+    <div class="hero-trust gsap-hero">
+      <div class="trust-pill">
+        <svg width="15" height="15" viewBox="0 0 14 14" fill="none"><path d="M7 1L8.5 5h4L9.5 7.5l1.5 4L7 9l-4 2.5 1.5-4L1.5 5h4z" stroke="#1D9E75" stroke-width="1.3" fill="none"/></svg>
+        North American Board Certified
+      </div>
+      <div class="trust-pill">
+        <svg width="15" height="15" viewBox="0 0 14 14" fill="none"><path d="M7 1l1 3h3L8.5 6l1 3L7 7.5 4.5 9l1-3L3 4h3z" stroke="#1D9E75" stroke-width="1.3" fill="none"/></svg>
+        DHA Licensed
+      </div>
+      <div class="trust-pill">
+        <svg width="15" height="15" viewBox="0 0 14 14" fill="none"><circle cx="7" cy="7" r="5.5" stroke="#1D9E75" stroke-width="1.3"/><path d="M4.5 7l2 2 3-3" stroke="#1D9E75" stroke-width="1.3" stroke-linecap="round"/></svg>
+        10+ Specialists
+      </div>
+    </div>
+  </div>
+  <div class="hero-visual glass-card gsap-hero-card" data-tilt data-tilt-max="5" data-tilt-speed="400" data-tilt-perspective="1000">
+    <div class="rating-card">
+      <div class="rating-icon">
+        <svg width="26" height="26" viewBox="0 0 22 22" fill="none"><path d="M11 2l2 6h6l-5 3.5 2 6L11 14l-5 3.5 2-6L3 8h6z" fill="#F59E0B"/></svg>
+      </div>
+      <div>
+        <div class="rating-val">5.0</div>
+        <div class="rating-stars"><div class="star"></div><div class="star"></div><div class="star"></div><div class="star"></div><div class="star"></div></div>
+        <div class="rating-sub">Based on 100+ Google Reviews</div>
+      </div>
+    </div>
+    <div class="stats-row">
+      <div class="stat-mini"><div class="stat-n">10+</div><div class="stat-l">Specialists</div></div>
+      <div class="stat-mini"><div class="stat-n">8+</div><div class="stat-l">Specialties</div></div>
+      <div class="stat-mini"><div class="stat-n">9 Yrs</div><div class="stat-l">In Dubai</div></div>
+    </div>
+    <div class="booking-strip" style="transform: translateZ(20px);">
+      <div>
+        <div class="booking-strip-text">Saturday – Thursday</div>
+        <div class="booking-strip-sub">10:00 am – 7:00 pm · Emergency care</div>
+      </div>
+      <button class="booking-strip-btn" onclick="sendPrompt('Call MMDC Dubai +97142776055 to book')">Call Now</button>
+    </div>
+  </div>
+</section>
+
+<!-- TRUST BAR -->
+<div class="trust-bar">
+  <div class="tb-item"><div class="tb-dot"></div>McGill University Trained</div>
+  <div class="tb-item"><div class="tb-dot"></div>Implant Specialists</div>
+  <div class="tb-item"><div class="tb-dot"></div>Invisalign Certified</div>
+  <div class="tb-item"><div class="tb-dot"></div>Pediatric Dentistry</div>
+  <div class="tb-item"><div class="tb-dot"></div>Flexible Payments</div>
+</div>
+
+<!-- SERVICES -->
+<section class="section services" id="services-sec">
+  <div class="section-header gsap-fade-up">
+    <div class="sec-eyebrow">What We Offer</div>
+    <h2 class="sec-title">Complete Dental Care<br><em>Under One Roof</em></h2>
+    <p class="sec-sub">From routine check-ups to complex implants — every specialty covered by our expert team.</p>
+  </div>
+  <div class="svc-grid">
+    <!-- Use VanillaTilt via data attributes -->
+    <div class="svc-card gsap-stagger-card" data-tilt data-tilt-max="10" data-tilt-speed="400" data-tilt-glare data-tilt-max-glare="0.2" onclick="sendPrompt('Tell me about dental implants at MMDC Dubai')">
+      <div class="svc-icon"><svg width="24" height="24" viewBox="0 0 20 20" fill="none"><rect x="5" y="2" width="10" height="16" rx="3" stroke="#0F6E56" stroke-width="1.5"/><line x1="10" y1="9" x2="10" y2="16" stroke="#0F6E56" stroke-width="1.5"/></svg></div>
+      <div class="svc-name">Dental Implants</div>
+      <div class="svc-desc">Same-day implants, All-on-4, All-on-6 & 3D guided surgery</div>
+      <div class="svc-link">Learn more →</div>
+    </div>
+    <div class="svc-card gsap-stagger-card" data-tilt data-tilt-max="10" data-tilt-speed="400" data-tilt-glare data-tilt-max-glare="0.2" onclick="sendPrompt('Tell me about cosmetic dentistry veneers MMDC Dubai')">
+      <div class="svc-icon"><svg width="24" height="24" viewBox="0 0 20 20" fill="none"><circle cx="10" cy="10" r="7" stroke="#0F6E56" stroke-width="1.5"/><path d="M7 11.5c.8 1.5 5.5 1.5 6 0" stroke="#0F6E56" stroke-width="1.5" stroke-linecap="round"/></svg></div>
+      <div class="svc-name">Cosmetic Dentistry</div>
+      <div class="svc-desc">Veneers, ZOOM whitening & smile makeovers</div>
+      <div class="svc-link">Learn more →</div>
+    </div>
+    <div class="svc-card gsap-stagger-card" data-tilt data-tilt-max="10" data-tilt-speed="400" data-tilt-glare data-tilt-max-glare="0.2" onclick="sendPrompt('Tell me about Invisalign orthodontics MMDC Dubai')">
+      <div class="svc-icon"><svg width="24" height="24" viewBox="0 0 20 20" fill="none"><path d="M3 10Q10 4.5 17 10Q10 15.5 3 10Z" stroke="#0F6E56" stroke-width="1.5" fill="none"/></svg></div>
+      <div class="svc-name">Orthodontics</div>
+      <div class="svc-desc">Invisalign, clear aligners, ceramic & metal braces</div>
+      <div class="svc-link">Learn more →</div>
+    </div>
+    <div class="svc-card gsap-stagger-card" data-tilt data-tilt-max="10" data-tilt-speed="400" data-tilt-glare data-tilt-max-glare="0.2" onclick="sendPrompt('Tell me about general dentistry MMDC Dubai')">
+      <div class="svc-icon"><svg width="24" height="24" viewBox="0 0 20 20" fill="none"><path d="M6 4h8M5 8h10M5 12h10M6 16h8" stroke="#0F6E56" stroke-width="1.5" stroke-linecap="round"/></svg></div>
+      <div class="svc-name">General Dentistry</div>
+      <div class="svc-desc">Check-ups, fillings, root canals & extractions</div>
+      <div class="svc-link">Learn more →</div>
+    </div>
+    <div class="svc-card gsap-stagger-card" data-tilt data-tilt-max="10" data-tilt-speed="400" data-tilt-glare data-tilt-max-glare="0.2" onclick="sendPrompt('Tell me about gum treatment MMDC Dubai')">
+      <div class="svc-icon"><svg width="24" height="24" viewBox="0 0 20 20" fill="none"><path d="M3 16Q10 4 17 16" stroke="#0F6E56" stroke-width="1.5" stroke-linecap="round" fill="none"/></svg></div>
+      <div class="svc-name">Gum Treatment</div>
+      <div class="svc-desc">Periodontics, deep cleaning & gum surgery</div>
+      <div class="svc-link">Learn more →</div>
+    </div>
+    <div class="svc-card gsap-stagger-card" data-tilt data-tilt-max="10" data-tilt-speed="400" data-tilt-glare data-tilt-max-glare="0.2" onclick="sendPrompt('Tell me about pediatric dentistry kids MMDC Dubai')">
+      <div class="svc-icon"><svg width="24" height="24" viewBox="0 0 20 20" fill="none"><circle cx="10" cy="7.5" r="3.5" stroke="#0F6E56" stroke-width="1.5"/><path d="M4 18c0-3 2.7-5 6-5s6 2 6 5" stroke="#0F6E56" stroke-width="1.5" stroke-linecap="round"/></svg></div>
+      <div class="svc-name">Pediatric Dentistry</div>
+      <div class="svc-desc">Kids dentistry, sedation & general anesthesia</div>
+      <div class="svc-link">Learn more →</div>
+    </div>
+    <div class="svc-card gsap-stagger-card" data-tilt data-tilt-max="10" data-tilt-speed="400" data-tilt-glare data-tilt-max-glare="0.2" onclick="sendPrompt('Tell me about oral surgery MMDC Dubai')">
+      <div class="svc-icon"><svg width="24" height="24" viewBox="0 0 20 20" fill="none"><path d="M6 14l8-8M14 14L6 6" stroke="#0F6E56" stroke-width="1.5" stroke-linecap="round"/></svg></div>
+      <div class="svc-name">Oral Surgery</div>
+      <div class="svc-desc">Wisdom teeth, TMJ treatment & sinus lift</div>
+      <div class="svc-link">Learn more →</div>
+    </div>
+    <div class="svc-card gsap-stagger-card" data-tilt data-tilt-max="10" data-tilt-speed="400" data-tilt-glare data-tilt-max-glare="0.2" onclick="sendPrompt('Tell me about prosthodontics crowns bridges MMDC Dubai')">
+      <div class="svc-icon"><svg width="24" height="24" viewBox="0 0 20 20" fill="none"><rect x="3" y="6" width="14" height="8" rx="2" stroke="#0F6E56" stroke-width="1.5"/><line x1="7" y1="6" x2="7" y2="14" stroke="#0F6E56" stroke-width="1"/><line x1="10" y1="6" x2="10" y2="14" stroke="#0F6E56" stroke-width="1"/><line x1="13" y1="6" x2="13" y2="14" stroke="#0F6E56" stroke-width="1"/></svg></div>
+      <div class="svc-name">Prosthodontics</div>
+      <div class="svc-desc">Crowns, bridges, dentures & ceramic inlays</div>
+      <div class="svc-link">Learn more →</div>
+    </div>
+  </div>
+</section>
+
+<!-- WHY CHOOSE -->
+<section class="section why" id="about-sec">
+  <div class="why-grid">
+    <div>
+      <div class="sec-eyebrow gsap-fade-up">Why Choose MMDC</div>
+      <h2 class="sec-title gsap-fade-up" style="margin-bottom:40px">World-Class Care,<br><em>Right Here in Dubai</em></h2>
+      <div class="why-points">
+        <div class="why-point gsap-stagger-list" data-tilt data-tilt-max="3" data-tilt-speed="400" data-tilt-axis="y">
+          <div class="why-icon"><svg width="22" height="22" viewBox="0 0 18 18" fill="none"><path d="M9 1l1.5 4.5h4.5l-3.5 2.5 1.5 4.5L9 10l-3.5 2.5 1.5-4.5L3.5 5.5H8z" stroke="#0F6E56" stroke-width="1.5" fill="none"/></svg></div>
+          <div><div class="why-title">North American-Trained Doctors</div><div class="why-text">Our doctors graduated from McGill University (Canada) & University of North Carolina (USA) — bringing international standards to Dubai.</div></div>
+        </div>
+        <div class="why-point gsap-stagger-list" data-tilt data-tilt-max="3" data-tilt-speed="400" data-tilt-axis="y">
+          <div class="why-icon"><svg width="22" height="22" viewBox="0 0 18 18" fill="none"><rect x="2" y="2" width="14" height="14" rx="3" stroke="#0F6E56" stroke-width="1.5"/><path d="M6 9l2.5 2.5 4-4" stroke="#0F6E56" stroke-width="1.5" stroke-linecap="round"/></svg></div>
+          <div><div class="why-title">All Specialties Under One Roof</div><div class="why-text">From children's first visit to complex implant surgery — no referrals needed. Every specialty available at one location.</div></div>
+        </div>
+        <div class="why-point gsap-stagger-list" data-tilt data-tilt-max="3" data-tilt-speed="400" data-tilt-axis="y">
+          <div class="why-icon"><svg width="22" height="22" viewBox="0 0 18 18" fill="none"><circle cx="9" cy="9" r="7" stroke="#0F6E56" stroke-width="1.5"/><path d="M9 5v4l3 3" stroke="#0F6E56" stroke-width="1.5" stroke-linecap="round"/></svg></div>
+          <div><div class="why-title">Flexible Appointments</div><div class="why-text">Open Saturday to Thursday, 10am–7pm. Emergency dental care available. Flexible payment plans offered.</div></div>
+        </div>
+        <div class="why-point gsap-stagger-list" data-tilt data-tilt-max="3" data-tilt-speed="400" data-tilt-axis="y">
+          <div class="why-icon"><svg width="22" height="22" viewBox="0 0 18 18" fill="none"><path d="M9 2C5.7 2 3 4.7 3 8c0 4.5 6 9 6 9s6-4.5 6-9c0-3.3-2.7-6-6-6z" stroke="#0F6E56" stroke-width="1.5"/><circle cx="9" cy="8" r="2" stroke="#0F6E56" stroke-width="1.5"/></svg></div>
+          <div><div class="why-title">Centrally Located in Dubai</div><div class="why-text">Tameem House, Dubai — easy to reach from JLT, JBR, Dubai Marina & Downtown Dubai.</div></div>
+        </div>
+      </div>
+    </div>
+    <div class="why-visual gsap-scale-up" data-tilt data-tilt-max="5" data-tilt-speed="400" data-tilt-glare data-tilt-max-glare="0.1">
+      <div class="wv-head" style="transform: translateZ(30px);">Our Mission</div>
+      <div class="wv-sub" style="transform: translateZ(20px);">To elevate the standard of dental care by delivering world-class services in a patient-centric environment — guided by specialists dedicated to lifelong dental wellness.</div>
+      <div class="wv-stat"><div class="wv-num">5.0★</div><div class="wv-label">Perfect Google rating across 100+ verified patient reviews</div></div>
+      <div class="wv-stat"><div class="wv-num">10+</div><div class="wv-label">Specialist doctors covering every area of dentistry</div></div>
+      <div class="wv-stat"><div class="wv-num">2016</div><div class="wv-label">Established in Dubai, serving families for 9+ years</div></div>
+      <div class="wv-stat"><div class="wv-num">0</div><div class="wv-label">Referrals needed — all specialties under one roof</div></div>
+    </div>
+  </div>
+</section>
+
+<!-- DOCTORS -->
+<section class="section doctors" id="doctors-sec">
+  <div class="section-header gsap-fade-up">
+    <div class="sec-eyebrow">Our Specialists</div>
+    <h2 class="sec-title">Meet Our <em>Expert Doctors</em></h2>
+    <p class="sec-sub">Trained at top universities across North America, UK, and Europe — all DHA licensed in Dubai.</p>
+  </div>
+  <div class="doc-grid">
+    <div class="doc-card gsap-stagger-card" data-tilt data-tilt-max="15" data-tilt-speed="400" data-tilt-glare data-tilt-max-glare="0.1" onclick="sendPrompt('Tell me more about Dr. Nawras Al-Khoury MMDC Dubai')"><div class="doc-avatar">NA</div><div class="doc-name">Dr. Nawras Al-Khoury</div><div class="doc-role">Co-Founder · Cosmetic Dentist & Implantologist</div><span class="doc-tag">McGill & UNC · USA & Canada</span></div>
+    <div class="doc-card gsap-stagger-card" data-tilt data-tilt-max="15" data-tilt-speed="400" data-tilt-glare data-tilt-max-glare="0.1" onclick="sendPrompt('Tell me more about Dr. Firas Al-Khoury MMDC Dubai')"><div class="doc-avatar">FA</div><div class="doc-name">Dr. Firas Al-Khoury</div><div class="doc-role">Co-Founder · General & Cosmetic Dentist</div><span class="doc-tag">McGill University · Canada</span></div>
+    <div class="doc-card gsap-stagger-card" data-tilt data-tilt-max="15" data-tilt-speed="400" data-tilt-glare data-tilt-max-glare="0.1" onclick="sendPrompt('Tell me more about Dr. Diala Sabanekh MMDC Dubai')"><div class="doc-avatar">DS</div><div class="doc-name">Dr. Diala Sabanekh</div><div class="doc-role">General & Pediatric Dentist</div><span class="doc-tag">McGill University · Canada</span></div>
+    <div class="doc-card gsap-stagger-card" data-tilt data-tilt-max="15" data-tilt-speed="400" data-tilt-glare data-tilt-max-glare="0.1" onclick="sendPrompt('Tell me more about Prof. Hani Salam MMDC Dubai')"><div class="doc-avatar">HS</div><div class="doc-name">Prof. Hani A. Salam</div><div class="doc-role">Oral & Maxillofacial Surgeon</div><span class="doc-tag">American & Canadian Board</span></div>
+    <div class="doc-card gsap-stagger-card" data-tilt data-tilt-max="15" data-tilt-speed="400" data-tilt-glare data-tilt-max-glare="0.1" onclick="sendPrompt('Tell me more about Dr. Seema Shah MMDC Dubai')"><div class="doc-avatar">SS</div><div class="doc-name">Dr. Seema Shah</div><div class="doc-role">Specialist Orthodontist</div><span class="doc-tag">Kings College London · UK</span></div>
+    <div class="doc-card gsap-stagger-card" data-tilt data-tilt-max="15" data-tilt-speed="400" data-tilt-glare data-tilt-max-glare="0.1" onclick="sendPrompt('Tell me more about Dr. Chantal Mhanna MMDC Dubai')"><div class="doc-avatar">CM</div><div class="doc-name">Dr. Chantal Mhanna</div><div class="doc-role">Periodontist · Gum Specialist</div><span class="doc-tag">15+ Years Experience</span></div>
+  </div>
+</section>
+
+<!-- REVIEWS -->
+<section class="section reviews" id="reviews-sec">
+  <div class="section-header gsap-fade-up">
+    <div class="sec-eyebrow">Patient Stories</div>
+    <h2 class="sec-title">What Our Patients <em>Say</em></h2>
+    <p class="sec-sub">5.0 stars across 100+ verified Google reviews — see why patients trust MMDC.</p>
+  </div>
+  <div class="review-grid">
+    <div class="review-card gsap-stagger-card" data-tilt data-tilt-max="8" data-tilt-speed="400" data-tilt-glare data-tilt-max-glare="0.05">
+      <div class="rev-header"><div class="rev-stars"><div class="star"></div><div class="star"></div><div class="star"></div><div class="star"></div><div class="star"></div></div><div class="rev-date">Aug 2024</div></div>
+      <div class="rev-text">"Dr Firas was so honest, thorough, and professional. Special mention to Clea at reception for her kindness and genuine care — she's actually the reason I chose this clinic."</div>
+      <div class="rev-author"><div class="rev-avatar">HM</div><div><div class="rev-name">H M</div><div class="rev-verified"><svg width="12" height="12" viewBox="0 0 10 10" fill="none"><circle cx="5" cy="5" r="4" fill="#1D9E75"/><path d="M3 5l1.5 1.5 3-3" stroke="white" stroke-width="1.2" stroke-linecap="round"/></svg> Verified Google Review</div></div></div>
+    </div>
+    <div class="review-card gsap-stagger-card" data-tilt data-tilt-max="8" data-tilt-speed="400" data-tilt-glare data-tilt-max-glare="0.05">
+      <div class="rev-header"><div class="rev-stars"><div class="star"></div><div class="star"></div><div class="star"></div><div class="star"></div><div class="star"></div></div><div class="rev-date">Jun 2024</div></div>
+      <div class="rev-text">"Best dental team in Dubai. Dr. Nawras provided the best solutions for my complicated case — bone surgery, implants, zero pain. Two years on, still feeling great."</div>
+      <div class="rev-author"><div class="rev-avatar">DP</div><div><div class="rev-name">Daniela Papp</div><div class="rev-verified"><svg width="12" height="12" viewBox="0 0 10 10" fill="none"><circle cx="5" cy="5" r="4" fill="#1D9E75"/><path d="M3 5l1.5 1.5 3-3" stroke="white" stroke-width="1.2" stroke-linecap="round"/></svg> Verified Google Review</div></div></div>
+    </div>
+    <div class="review-card gsap-stagger-card" data-tilt data-tilt-max="8" data-tilt-speed="400" data-tilt-glare data-tilt-max-glare="0.05">
+      <div class="rev-header"><div class="rev-stars"><div class="star"></div><div class="star"></div><div class="star"></div><div class="star"></div><div class="star"></div></div><div class="rev-date">Jun 2024</div></div>
+      <div class="rev-text">"Dr. Anna quickly put us at ease during my child's emergency visit. Her professionalism and experience level resolved the issue efficiently. Clinic is conveniently located."</div>
+      <div class="rev-author"><div class="rev-avatar">AF</div><div><div class="rev-name">Anatoly Fomin</div><div class="rev-verified"><svg width="12" height="12" viewBox="0 0 10 10" fill="none"><circle cx="5" cy="5" r="4" fill="#1D9E75"/><path d="M3 5l1.5 1.5 3-3" stroke="white" stroke-width="1.2" stroke-linecap="round"/></svg> Verified Google Review</div></div></div>
+    </div>
+    <div class="review-card gsap-stagger-card" data-tilt data-tilt-max="8" data-tilt-speed="400" data-tilt-glare data-tilt-max-glare="0.05">
+      <div class="rev-header"><div class="rev-stars"><div class="star"></div><div class="star"></div><div class="star"></div><div class="star"></div><div class="star"></div></div><div class="rev-date">May 2024</div></div>
+      <div class="rev-text">"Dr Diala is my kids' dentist and they love her — so kind and detail oriented. My kids actually look forward to going. Great doctors, nurses and clinic overall. Highly recommended!"</div>
+      <div class="rev-author"><div class="rev-avatar">BK</div><div><div class="rev-name">Bassel Kabbabe</div><div class="rev-verified"><svg width="12" height="12" viewBox="0 0 10 10" fill="none"><circle cx="5" cy="5" r="4" fill="#1D9E75"/><path d="M3 5l1.5 1.5 3-3" stroke="white" stroke-width="1.2" stroke-linecap="round"/></svg> Verified Google Review</div></div></div>
+    </div>
+  </div>
+</section>
+
+<!-- CTA -->
+<section class="cta-section">
+  <div style="position:relative;z-index:1" class="gsap-scale-up">
+    <div class="cta-eyebrow">Take The First Step</div>
+    <h2 class="cta-title">Ready for a<br><em>Healthier Smile?</em></h2>
+    <p class="cta-sub">Book your free consultation today. Our specialists are here to help.</p>
+    <div class="cta-btns">
+      <button class="btn-white" onclick="sendPrompt('Book appointment MMDC Dubai +97142776055')">Book Free Consultation</button>
+      <button class="btn-outline-white" onclick="sendPrompt('What services does MMDC offer?')">Explore Services</button>
+    </div>
+    <div class="cta-info">
+      <div class="cta-info-item"><svg width="16" height="16" viewBox="0 0 14 14" fill="none"><circle cx="7" cy="7" r="5.5" stroke="rgba(255,255,255,.6)" stroke-width="1.3"/><path d="M7 4v3l2 2" stroke="rgba(255,255,255,.6)" stroke-width="1.3" stroke-linecap="round"/></svg> Sat–Thu · 10am–7pm</div>
+      <div class="cta-info-item"><svg width="16" height="16" viewBox="0 0 14 14" fill="none"><path d="M2 2h3l1.5 3.5-2 1.2a8 8 0 003.8 3.8L9.5 8.5 13 10v3a1.5 1.5 0 01-1.5 1.5C4 14.5.5 11 .5 4A1.5 1.5 0 012 2z" stroke="rgba(255,255,255,.6)" stroke-width="1.3" stroke-linecap="round"/></svg> +971 4 277 6055</div>
+      <div class="cta-info-item"><svg width="16" height="16" viewBox="0 0 14 14" fill="none"><rect x="1" y="3" width="12" height="9" rx="1.5" stroke="rgba(255,255,255,.6)" stroke-width="1.3"/><path d="M1 5.5l6 4 6-4" stroke="rgba(255,255,255,.6)" stroke-width="1.3" stroke-linecap="round"/></svg> info@mmdc.ae</div>
+      <div class="cta-info-item"><svg width="16" height="16" viewBox="0 0 14 14" fill="none"><path d="M7 1C4.8 1 3 2.8 3 5c0 3.5 4 8 4 8s4-4.5 4-8c0-2.2-1.8-4-4-4z" stroke="rgba(255,255,255,.6)" stroke-width="1.3"/><circle cx="7" cy="5" r="1.5" stroke="rgba(255,255,255,.6)" stroke-width="1.3"/></svg> Tameem House, Dubai</div>
+    </div>
+  </div>
+</section>
+
+<!-- CONTACT -->
+<section class="contact" id="contact-sec">
+  <div class="section-header gsap-fade-up">
+    <div class="sec-eyebrow">Find Us</div>
+    <h2 class="sec-title">Get In <em>Touch</em></h2>
+  </div>
+  <div class="contact-grid">
+    <div class="contact-card gsap-stagger-card" data-tilt data-tilt-max="15" data-tilt-speed="400" data-tilt-glare data-tilt-max-glare="0.1">
+      <div class="contact-ic"><svg width="26" height="26" viewBox="0 0 22 22" fill="none"><path d="M3 3h4l2 5-2.5 1.5a11 11 0 005 5L13 12l5 2v4a2 2 0 01-2 2C8 20 2 14 2 7a2 2 0 012-2h-1z" stroke="#0F6E56" stroke-width="1.5" stroke-linecap="round"/></svg></div>
+      <div class="contact-lbl">Call Us</div>
+      <div class="contact-val">+971 4 277 6055</div>
+      <div class="contact-val2">+971 50 158 2454</div>
+    </div>
+    <div class="contact-card gsap-stagger-card" data-tilt data-tilt-max="15" data-tilt-speed="400" data-tilt-glare data-tilt-max-glare="0.1">
+      <div class="contact-ic"><svg width="26" height="26" viewBox="0 0 22 22" fill="none"><rect x="2" y="5" width="18" height="13" rx="2" stroke="#0F6E56" stroke-width="1.5"/><path d="M2 8l9 6 9-6" stroke="#0F6E56" stroke-width="1.5" stroke-linecap="round"/></svg></div>
+      <div class="contact-lbl">Email Us</div>
+      <div class="contact-val">info@mmdc.ae</div>
+      <div class="contact-val2">We reply within 24 hours</div>
+    </div>
+    <div class="contact-card gsap-stagger-card" data-tilt data-tilt-max="15" data-tilt-speed="400" data-tilt-glare data-tilt-max-glare="0.1">
+      <div class="contact-ic"><svg width="26" height="26" viewBox="0 0 22 22" fill="none"><path d="M11 2C7.13 2 4 5.13 4 9c0 5.25 7 11 7 11s7-5.75 7-11c0-3.87-3.13-7-7-7z" stroke="#0F6E56" stroke-width="1.5"/><circle cx="11" cy="9" r="2.5" stroke="#0F6E56" stroke-width="1.5"/></svg></div>
+      <div class="contact-lbl">Location</div>
+      <div class="contact-val">Tameem House, Dubai</div>
+      <div class="contact-val2">Near JLT · Marina · Downtown</div>
+    </div>
+  </div>
+</section>
+
+<!-- FOOTER -->
+<footer class="footer">
+  <div class="footer-logo">MMDC <span>Dental</span></div>
+  <div class="footer-copy">© 2016–2026 MMDC Medical & Dental Center · All Rights Reserved</div>
+  <a href="https://mmdc.ae" class="footer-link">Visit mmdc.ae ↗</a>
+</footer>
+
+<script>
+// ==========================================
+// 1. THREE.JS 3D BACKGROUND INITIALIZATION
+// ==========================================
+const initThreeJS = () => {
+  const container = document.getElementById('canvas-container');
+  const scene = new THREE.Scene();
+  
+  // Camera
+  const camera = new THREE.PerspectiveCamera(75, window.innerWidth / window.innerHeight, 0.1, 1000);
+  camera.position.z = 15;
+  camera.position.x = 5;
+
+  // Renderer
+  const renderer = new THREE.WebGLRenderer({ alpha: true, antialias: true });
+  renderer.setSize(window.innerWidth, window.innerHeight);
+  renderer.setPixelRatio(Math.min(window.devicePixelRatio, 2));
+  container.appendChild(renderer.domElement);
+
+  // Lighting
+  const ambientLight = new THREE.AmbientLight(0xffffff, 0.6);
+  scene.add(ambientLight);
+
+  const directionalLight = new THREE.DirectionalLight(0xffffff, 0.8);
+  directionalLight.position.set(10, 20, 10);
+  scene.add(directionalLight);
+  
+  const pointLight = new THREE.PointLight(0x1D9E75, 2, 50);
+  pointLight.position.set(-5, -5, 5);
+  scene.add(pointLight);
+
+  // Create Abstract 3D Shapes (e.g. smooth dental-like objects/bubbles)
+  const group = new THREE.Group();
+  scene.add(group);
+
+  const material = new THREE.MeshPhysicalMaterial({
+    color: 0xffffff,
+    metalness: 0.1,
+    roughness: 0.1,
+    transmission: 0.9, // glass-like
+    ior: 1.5,
+    thickness: 0.5,
+    clearcoat: 1.0,
+    clearcoatRoughness: 0.1
+  });
+
+  // Create 3D Tooth Shape using ExtrudeGeometry
+  const toothShape = new THREE.Shape();
+  toothShape.moveTo(0, 1.5);
+  // Top right curve
+  toothShape.bezierCurveTo(1.5, 1.5, 2.5, 0.5, 2, -0.5);
+  // Right side down to root
+  toothShape.bezierCurveTo(1.8, -1.5, 1.5, -2.5, 1.2, -3.5);
+  // Right root tip
+  toothShape.bezierCurveTo(0.8, -4.2, 0.2, -3.5, 0.4, -2.0);
+  // Inner curve between roots
+  toothShape.bezierCurveTo(0.5, -1.0, -0.5, -1.0, -0.4, -2.0);
+  // Left root tip
+  toothShape.bezierCurveTo(-0.2, -3.5, -0.8, -4.2, -1.2, -3.5);
+  // Left side up
+  toothShape.bezierCurveTo(-1.5, -2.5, -1.8, -1.5, -2, -0.5);
+  // Top left curve back to center
+  toothShape.bezierCurveTo(-2.5, 0.5, -1.5, 1.5, 0, 1.5);
+
+  const extrudeSettings = {
+    steps: 2,
+    depth: 1.0,
+    bevelEnabled: true,
+    bevelThickness: 0.8,
+    bevelSize: 0.8,
+    bevelOffset: -0.2,
+    bevelSegments: 16
+  };
+
+  const toothGeometry = new THREE.ExtrudeGeometry(toothShape, extrudeSettings);
+  // Center the geometry to make rotation look natural
+  toothGeometry.computeBoundingBox();
+  const bBox = toothGeometry.boundingBox;
+  toothGeometry.translate(
+    -(bBox.max.x - bBox.min.x) / 2 - bBox.min.x,
+    -(bBox.max.y - bBox.min.y) / 2 - bBox.min.y,
+    -0.5 // Half of depth
+  );
+
+  // Main large 3D Tooth
+  const toothMesh1 = new THREE.Mesh(toothGeometry, material);
+  toothMesh1.scale.set(1.4, 1.4, 1.4);
+  toothMesh1.position.set(8, 0, -2);
+  group.add(toothMesh1);
+
+  // Smaller floating tooth (mint colored)
+  const material2 = new THREE.MeshPhysicalMaterial({
+    color: 0x1D9E75,
+    metalness: 0.1,
+    roughness: 0.2,
+    transmission: 0.6,
+    clearcoat: 1.0
+  });
+  const toothMesh2 = new THREE.Mesh(toothGeometry, material2);
+  toothMesh2.scale.set(0.6, 0.6, 0.6);
+  toothMesh2.position.set(13, 4, -6);
+  group.add(toothMesh2);
+  
+  // Another small floating tooth
+  const toothMesh3 = new THREE.Mesh(toothGeometry, material);
+  toothMesh3.scale.set(0.7, 0.7, 0.7);
+  toothMesh3.position.set(2, -6, -4);
+  group.add(toothMesh3);
+
+  // Animation Loop
+  const clock = new THREE.Clock();
+  
+  // Mouse interaction
+  let mouseX = 0;
+  let mouseY = 0;
+  let targetX = 0;
+  let targetY = 0;
+  const windowHalfX = window.innerWidth / 2;
+  const windowHalfY = window.innerHeight / 2;
+
+  document.addEventListener('mousemove', (event) => {
+    mouseX = (event.clientX - windowHalfX);
+    mouseY = (event.clientY - windowHalfY);
+  });
+
+  const animate = () => {
+    requestAnimationFrame(animate);
+    const elapsedTime = clock.getElapsedTime();
+
+    // Rotate teeth smoothly
+    toothMesh1.rotation.y = elapsedTime * 0.15;
+    toothMesh1.rotation.x = Math.sin(elapsedTime * 0.5) * 0.2;
+    toothMesh1.position.y = Math.sin(elapsedTime * 1) * 0.5;
+    
+    toothMesh2.rotation.y = elapsedTime * 0.2;
+    toothMesh2.rotation.z = Math.sin(elapsedTime * 0.3) * 0.3;
+    toothMesh2.position.y = 4 + Math.sin(elapsedTime * 0.8) * 1;
+    
+    toothMesh3.rotation.y = elapsedTime * -0.2;
+    toothMesh3.rotation.x = Math.sin(elapsedTime * 0.4) * 0.3;
+    toothMesh3.position.y = -6 + Math.sin(elapsedTime * 0.6) * 1.5;
+
+    // Mouse parallax effect
+    targetX = mouseX * 0.001;
+    targetY = mouseY * 0.001;
+    
+    group.rotation.y += 0.05 * (targetX - group.rotation.y);
+    group.rotation.x += 0.05 * (targetY - group.rotation.x);
+
+    renderer.render(scene, camera);
+  };
+
+  animate();
+
+  // Handle Resize
+  window.addEventListener('resize', () => {
+    camera.aspect = window.innerWidth / window.innerHeight;
+    camera.updateProjectionMatrix();
+    renderer.setSize(window.innerWidth, window.innerHeight);
+  });
+};
+
+// ==========================================
+// 2. GSAP SCROLL ANIMATIONS
+// ==========================================
+const initGSAP = () => {
+  gsap.registerPlugin(ScrollTrigger);
+
+  // Hero Section Load Animation
+  const heroTl = gsap.timeline();
+  heroTl.fromTo('.gsap-hero', 
+    { y: 50, opacity: 0, rotateX: -15 }, 
+    { y: 0, opacity: 1, rotateX: 0, duration: 1, stagger: 0.15, ease: 'power3.out', delay: 0.2 }
+  );
+  
+  heroTl.fromTo('.gsap-hero-card',
+    { x: 100, opacity: 0, rotateY: 20 },
+    { x: 0, opacity: 1, rotateY: 0, duration: 1.2, ease: 'power3.out' },
+    "-=0.8"
+  );
+
+  // Generic Fade Up
+  gsap.utils.toArray('.gsap-fade-up').forEach(element => {
+    gsap.fromTo(element, 
+      { y: 60, opacity: 0 },
+      {
+        y: 0,
+        opacity: 1,
+        duration: 1,
+        ease: 'power3.out',
+        scrollTrigger: {
+          trigger: element,
+          start: 'top 85%',
+          toggleActions: 'play none none reverse'
+        }
+      }
+    );
+  });
+
+  // Staggered Cards (Services, Doctors, Reviews, Contact)
+  const staggerSections = ['.svc-grid', '.doc-grid', '.review-grid', '.contact-grid'];
+  staggerSections.forEach(selector => {
+    const grid = document.querySelector(selector);
+    if (grid) {
+      const cards = grid.querySelectorAll('.gsap-stagger-card');
+      gsap.fromTo(cards,
+        { y: 80, opacity: 0, rotateX: -10, scale: 0.95 },
+        {
+          y: 0,
+          opacity: 1,
+          rotateX: 0,
+          scale: 1,
+          duration: 0.8,
+          stagger: 0.1,
+          ease: 'power3.out',
+          scrollTrigger: {
+            trigger: grid,
+            start: 'top 80%',
+            toggleActions: 'play none none reverse'
+          }
+        }
+      );
+    }
+  });
+
+  // Why Choose Us list stagger
+  gsap.fromTo('.why-point',
+    { x: -50, opacity: 0 },
+    {
+      x: 0,
+      opacity: 1,
+      duration: 0.8,
+      stagger: 0.15,
+      ease: 'power3.out',
+      scrollTrigger: {
+        trigger: '.why-points',
+        start: 'top 80%',
+        toggleActions: 'play none none reverse'
+      }
+    }
+  );
+
+  // Scale Up effect
+  gsap.utils.toArray('.gsap-scale-up').forEach(element => {
+    gsap.fromTo(element,
+      { scale: 0.8, opacity: 0, rotateX: 10 },
+      {
+        scale: 1,
+        opacity: 1,
+        rotateX: 0,
+        duration: 1.2,
+        ease: 'expo.out',
+        scrollTrigger: {
+          trigger: element,
+          start: 'top 85%',
+          toggleActions: 'play none none reverse'
+        }
+      }
+    );
+  });
+};
+
+// Initialize everything on load
+window.addEventListener('DOMContentLoaded', () => {
+  // Vanilla-tilt is automatically initialized by the data-tilt attributes
+  initThreeJS();
+  initGSAP();
+});
+</script>
+</body>
+</html>
